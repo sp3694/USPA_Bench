@@ -1,8 +1,8 @@
 ---
-title: "Bench_Press_raw"
+title: "Interactive"
 author: "Stephen Powers"
-date: "10/18/2019"
-output: github_document
+date: "10/22/2019"
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -15,7 +15,7 @@ library(plotly)
 ```
 
 
-```{r }
+```{r include = FALSE}
 records = 
   read_csv("./Powerlifting.csv") %>% 
     janitor::clean_names() %>% 
@@ -33,36 +33,7 @@ records =
        ifelse(grepl("men", Gender), "Male"))) %>% view
 ```
 
-
-```{r plot1, warning=FALSE}
-records %>% 
-   mutate(
-    weightclass_kg = as.numeric(gsub("[kg - +kg]", "", weightclass_kg)), 
-    weightclass_lbs = as.numeric(gsub("lb", "", weightclass_lbs))) %>% 
-  group_by(gender) %>% 
-  mutate(rank = min_rank(desc(kgs))) %>% 
-  filter(rank < 7) %>% 
-  ggplot(aes(x = reorder(member_name, kgs), 
-             y = kgs, 
-             group = gender, 
-             fill = weightclass_kg,)) +  
-  geom_col(position = "dodge") +
-  facet_grid(~gender, scales = "free") +
-  theme_minimal() +
-  viridis::scale_fill_viridis(
-          option = "cividis",
-        name = "Weight Class (kgs)",
-        ) +
-  ggtitle("Heaviest Raw Bench Press Records According to USPA") +
-  xlab("Lifter") +
-  ylab("Max Raw Bench Press in Kilograms") +
-  theme(axis.text.x = element_text(size = 10, angle = 45, hjust = 1), 
-        axis.text.y = element_text(size = 10),
-        plot.title = element_text(size = 15, hjust = .5))
-```
-
-
-```{r plot2}
+```{r plot2, echo=FALSE, warning=FALSE}
 plot2 = 
   records %>% 
     mutate(
@@ -81,13 +52,3 @@ plot2 =
 
 ggplotly(plot2)
 ```
-
-```{r}
-records %>% 
-  mutate(
-    weightclass_kg = as.numeric(gsub("[kg - +kg]", "", weightclass_kg)), 
-    weightclass_lbs = as.numeric(gsub("lb", "", weightclass_lbs))) %>% 
-    plot_ly(x = ~weightclass_kg, y = ~kgs, type = "scatter",
-      color = ~gender, text = ~member_name)
-```
-
